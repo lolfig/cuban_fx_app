@@ -1,0 +1,8 @@
+**.pickle
+**.json
+**.parquet
+**.ipynb
+**.pyc
+**.env
+**.venv**
+**.code-workspace
