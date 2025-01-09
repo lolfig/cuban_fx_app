@@ -1,9 +1,12 @@
-# tools
 import json
+import dash
+import dash_bootstrap_components as dbc
+
+# tools
 from tools.const import DIR_DATA_ANALYTICS, DIR_DATA_MESSAGES
-from framework_scraping.tools.missing_dates import get_missing_dates
 
 # framework
+from framework_scraping.tools.missing_dates import get_missing_dates
 from framework_scraping.definitions import DataProcessing, PriceTimeSeries
 from framework_analytics.definitions import DataAnalytics
 
@@ -35,7 +38,10 @@ def main():
 
     print("Iniciando dashboard...")
 
-    from app_dashboard.dashboard_app import app
+    from app_dashboard import load_dashboard
+
+    app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+    load_dashboard(app)
 
     app.run_server(debug=True)
 
