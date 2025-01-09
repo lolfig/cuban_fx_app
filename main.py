@@ -1,6 +1,8 @@
 # tools
+import json
 from tools.const import DIR_DATA_ANALYTICS, DIR_DATA_MESSAGES
 from framework_scraping.tools.missing_dates import get_missing_dates
+
 # framework
 from framework_scraping.definitions import DataProcessing, PriceTimeSeries
 from framework_analytics.definitions import DataAnalytics
@@ -19,14 +21,22 @@ def main():
         analytics.do_analytics()
         analytics.dataframe.to_pickle(f"{DIR_DATA_ANALYTICS}/analytics.pickle")
 
+        with open(f"{DIR_DATA_ANALYTICS}/all_orders.json", "w") as file:
+            json.dump(analytics.orders, file)
+
         price_series = PriceTimeSeries(
-            missing_dates.start_date, missing_dates.end_date, DIR_DATA_ANALYTICS, ['Compra', 'Venta'], currency='USD'
+            missing_dates.start_date,
+            missing_dates.end_date,
+            DIR_DATA_ANALYTICS,
+            ["Compra", "Venta"],
+            currency="USD",
         )
         price_series.get_time_series()
 
     print("Iniciando dashboard...")
 
     from app_dashboard.dashboard_app import app
+
     app.run_server(debug=True)
 
 

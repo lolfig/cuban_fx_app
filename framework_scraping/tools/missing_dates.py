@@ -8,7 +8,7 @@ from framework_scraping.tools.types import MissingDates
 
 
 def get_missing_dates(data_dir: str) -> MissingDates:
-    start_date = datetime.datetime.strptime("2022-08-01", "%Y-%m-%d")
+    start_date = datetime.datetime.strptime("2021-07-23", "%Y-%m-%d")
     end_date = datetime.datetime.now() - datetime.timedelta(days=1)
 
     all_dates = [
@@ -17,14 +17,14 @@ def get_missing_dates(data_dir: str) -> MissingDates:
     ]
 
     existing_files = os.listdir(data_dir)
-    existing_dates = [file.split('.')[0] for file in existing_files if file.endswith('.parquet')]
+    existing_dates = [
+        file.split(".")[0] for file in existing_files if file.endswith(".parquet")
+    ]
 
     missing_dates = [date for date in all_dates if date not in existing_dates]
 
     return MissingDates(
-        dates=missing_dates,
-        start_date=all_dates[0],
-        end_date=all_dates[-1]
+        dates=missing_dates, start_date=all_dates[0], end_date=all_dates[-1]
     )
 
 
