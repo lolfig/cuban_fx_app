@@ -40,7 +40,13 @@ def main():
 
     from app_dashboard import load_dashboard
 
-    app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+    app = dash.Dash(
+        __name__,
+        external_stylesheets=[
+            dbc.themes.BOOTSTRAP,
+            dbc.icons.BOOTSTRAP
+        ]
+    )
     load_dashboard(app)
 
     app.run_server(debug=True)

@@ -1,9 +1,15 @@
 from dash import dcc, html
+import dash
 from dash.dependencies import Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
 
-from app_dashboard.cmp.my_card import my_card
+from app_dashboard.cmp import (
+    cards as customs_cards,
+    imgs as custom_imgs,
+    tables as custom_tables,
+    head_lines as custom_head_lines,
+)
 from tools import formaters
 from .tools import cache as tools_cache
 from tools.const import DIR_DATA_ANALYTICS
@@ -15,7 +21,8 @@ def load_dashboard(app):
 
     # Load data
     analytics, series = tools_cache.load_data(DIR_DATA_ANALYTICS)
-    price_series, volumes_series = tools_cache.load_time_series(analytics, series)
+    price_series, volumes_series = tools_cache.load_time_series(
+        analytics, series)
     (
         avg_daily_messages,
         _,
@@ -26,205 +33,160 @@ def load_dashboard(app):
     number_messages = tools_cache.get_time_serie_num_messages(analytics)
     daily_data = tools_cache.prepare_daily_data(analytics)
 
-    app.layout = html.Div(
-        [
-            dbc.Container(
-                [
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.Img(
-                                    src=app.get_asset_url("ff_logo.png"),
-                                    style={
-                                        "display": "block",
-                                        "margin": "0 auto",
-                                        "width": "150px",
-                                    },
-                                ),
-                                className="mb-2",
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.H1(
-                                    "Cuban Currency Market Dashboard",
-                                    className="text-center",
-                                ),
-                                className="mb-4 mt-2",
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.H3("Información Básica (USD/CUP)"),
-                                className="mb-4",
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                [
-                                    html.H4("Inicio de la Serie"),
-                                    dbc.Table.from_dataframe(
-                                        price_series[["USDCUP_Marginal"]]
-                                        .head(8)
-                                        .reset_index(),
-                                        striped=True,
-                                        bordered=True,
-                                        hover=True,
-                                    ),
-                                ],
-                                width=4,
-                            ),
-                            dbc.Col(
-                                [
-                                    html.H4("Final de la Serie"),
-                                    dbc.Table.from_dataframe(
-                                        price_series[["USDCUP_Marginal"]]
-                                        .tail(8)
-                                        .reset_index(),
-                                        striped=True,
-                                        bordered=True,
-                                        hover=True,
-                                    ),
-                                ],
-                                width=4,
-                            ),
-                            dbc.Col(
-                                [
-                                    html.H4("Métricas"),
-                                    dbc.Table.from_dataframe(
-                                        price_series[["USDCUP_Marginal"]]
-                                        .describe()
-                                        .reset_index(),
-                                        striped=True,
-                                        bordered=True,
-                                        hover=True,
-                                    ),
-                                ],
-                                width=4,
-                            ),
-                        ]
-                    ),
-                    dbc.Row([dbc.Col(html.H3("Series Temporales"), className="mb-4")]),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dcc.Graph(
-                                    figure=px.line(
-                                        price_series, title="Serie de Precios"
-                                    )
-                                ),
-                                width=12,
-                            ),
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dcc.Graph(
-                                    figure=px.line(
-                                        volumes_series, title="Serie de Volúmenes"
-                                    )
-                                ),
-                                width=12,
-                            )
-                        ]
-                    ),
-                    dbc.Row([dbc.Col(html.H3("Estadística Diaria"), className="mb-4")]),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dcc.Dropdown(
-                                    id="date-dropdown",
-                                    options=(
-                                        elems := [
-                                            formaters.date_format(date)
-                                            for date in analytics.index.unique()
-                                        ]
-                                    ),
-                                    value=elems[-1],
-                                ),
-                                width=12,
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(dcc.Graph(id="histogram-vol-price"), width=6),
-                            dbc.Col(dcc.Graph(id="supply-demand"), width=6),
-                        ]
-                    ),
-                    dbc.Row([dbc.Col(html.H3("Mensajes"), className="mb-4")]),
-                    dbc.Row(
-                        [
-                            dbc.Col(my_card(title, message), width=3)
-                            for title, message in [
-                                ("% Mensajes con 4 campos", "94.41%"),
-                                ("Promedio Diario", f"{avg_daily_messages}"),
-                                ("% Compra", f"{percent_compra}%"),
-                                ("% Venta", f"{percent_venta}%"),
-                            ]
-                        ]
-                    ),
-                    dbc.Row(
-                        [dbc.Col(html.H3("Procesado de Mensajes"), className="mb-4")]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dcc.Dropdown(
-                                    id="messages-date-dropdown",
-                                    options=(
-                                        elems := [date for date in analytics.index.date]
-                                    ),
-                                    value=elems[-1],
-                                ),
-                                width=12,
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.Div(id="messages-table"),
-                                width=12,
-                                style={
-                                    "maxHeight": "300px",  # Ajusta esta altura según tus necesidades
-                                    "overflowY": "auto",
-                                },
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.H3("Serie Temporal: Numero de Mensajes"),
-                                className="mb-4",
-                            )
-                        ]
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dcc.Graph(
-                                    figure=px.line(
-                                        number_messages,
-                                        title="Serie Temporal: Numero de Mensajes",
-                                    )
-                                ),
-                                width=12,
-                            )
-                        ]
-                    ),
-                ]
+    app.layout = dbc.Container([
+        dbc.Button(
+            html.I(className="bi bi-list"),   # Icono de tres rayas
+            id="open-drawer",
+            n_clicks=0,
+            color="primary",
+            className="me-2"
+        ),
+        dbc.Offcanvas(
+            [
+                html.H5("Contenido del Drawer"),
+                html.P("Aquí puedes colocar el contenido que desees."),
+                dbc.Button("Cerrar", id="close-drawer", n_clicks=0)
+            ],
+            id="drawer",
+            is_open=False,
+            placement="start",  # Posición: 'start' para izquierda, 'end' para derecha
+        ),
+        dbc.Row([
+            custom_imgs.logo_image(
+                src=app.get_asset_url("logo_clean.png"),
+            ),
+            custom_imgs.logo_image(
+                src=app.get_asset_url("ff_logo.png"),
+            ),
+        ],
+            className="mb-2",
+        ),
+        custom_head_lines.h1("Cuban Currency Market Dashboard"),
+        custom_head_lines.h3("Información General"),
+        dbc.Row([
+            custom_tables.table_head(
+                "Inicio de la Serie",
+                price_series[["USDCUP_Marginal"]]
+                .reset_index()
+                .rename(columns={"index": "fecha"})
+                .head(8),
+            ),
+            custom_tables.table_head(
+                "Final de la Serie",
+                price_series[["USDCUP_Marginal"]]
+                .reset_index()
+                .rename(columns={"index": "fecha"})
+                .tail(8),
+            ),
+            custom_tables.table_head(
+                "Métricas",
+                price_series[["USDCUP_Marginal"]]
+                .describe()
+                .reset_index()
+                .rename(columns={"index": "estadística"}),
+            ),
+        ]),
+        custom_head_lines.h3("Series Temporales"),
+        dbc.Row([
+            dbc.Col(
+                dcc.Graph(
+                    figure=px.line(
+                        price_series.round(2), title="Serie de Precios"
+                    )
+                ),
+                width=12,
+            ),
+        ]),
+        dbc.Row([
+            dbc.Col(
+                dcc.Graph(
+                    figure=px.line(
+                        volumes_series.round(2),
+                        title="Serie de Volúmenes",
+                    )
+                ),
+                width=12,
             )
         ]
-    )
+        ),
+        dbc.Row([dbc.Col(html.H3("Estadística Diaria"), className="mb-4")]),
+        dbc.Row([
+            dbc.Col(
+                dcc.Dropdown(
+                    id="date-dropdown",
+                    options=(
+                        elems := [
+                            formaters.date_format(date)
+                            for date in analytics.index.unique()
+                        ]
+                    ),
+                    value=elems[-1],
+                ),
+                width=12,
+            )
+        ]),
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="histogram-vol-price"), width=6),
+            dbc.Col(dcc.Graph(id="supply-demand"), width=6),
+        ]),
+        dbc.Row([dbc.Col(html.H3("Mensajes"), className="mb-4")]),
+        dbc.Row([
+            dbc.Col(customs_cards.basic_card(title, message), width=3)
+            for title, message in [
+                ("Mensajes con 4 campos", "94.41%"),
+                ("Promedio Diario", f"{avg_daily_messages:.2f}"),
+                ("Compra", f"{percent_compra:.2f}%"),
+                ("Venta", f"{percent_venta:.2f}%"),
+            ]
+        ]),
+        dbc.Row([dbc.Col(html.H3("Procesado de Mensajes"), className="mb-4")]),
+        dbc.Row([
+            dbc.Col(dcc.Dropdown(
+                id="messages-date-dropdown",
+                options=(
+                    elems := [date for date in analytics.index.date]),
+                value=elems[-1],
+            ),
+                width=12,
+            )
+        ]),
+        dbc.Row([
+            dbc.Col(
+                html.Div(id="messages-table"),
+                width=12,
+                style={
+                    "maxHeight": "300px",  # Ajusta esta altura según tus necesidades
+                    "overflowY": "auto",
+                },
+            )
+        ]),
+        dbc.Row([
+            dbc.Col(
+                html.H3("Serie Temporal: Numero de Mensajes"),
+                className="mb-4",
+            )
+        ]),
+        dbc.Row([
+            dbc.Col(
+                dcc.Graph(
+                    figure=px.line(
+                        number_messages.round(2),
+                        title="Serie Temporal: Numero de Mensajes",
+                    )
+                ),
+                width=12,
+            )
+        ]),
+    ])
+
+    @app.callback(
+        Output("drawer", "is_open"),
+        [Input("open-drawer", "n_clicks"), Input("close-drawer", "n_clicks")],
+        [dash.dependencies.State("drawer", "is_open")],)
+    def toggle_drawer(n1, n2, is_open):
+        if n1 or n2:
+            return not is_open
+        return is_open
 
     @app.callback(
         Output("histogram-vol-price", "figure"),
@@ -288,10 +250,11 @@ def load_dashboard(app):
         return {}, {}
 
     @app.callback(
-        Output("messages-table", "children"), Input("messages-date-dropdown", "value")
+        Output("messages-table", "children"),
+        Input("messages-date-dropdown", "value")
     )
     def update_messages_table(selected_messages_date):
-        messages = cache.load_raw_messages(selected_messages_date)
+        messages = tools_cache.load_raw_messages(selected_messages_date)
         if not messages.empty:
             return dbc.Table.from_dataframe(
                 messages, striped=True, bordered=True, hover=True
