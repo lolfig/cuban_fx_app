@@ -1,3 +1,4 @@
+import datetime
 import json
 from os import path
 
@@ -15,28 +16,48 @@ from services.framework_scraping.time_series_fetcher import PriceTimeSeries
 from services.framework_scraping.tools.missing_dates import get_missing_dates
 
 
-class DataStore:
+async def fetch_time_series(start_date, end_date):
+  price_series = PriceTimeSeries(
+    start_date,
+    end_date,
+    DIR_DATA_ANALYTICS,
+    ["Compra", "Venta"],
+    currency="USD",
+  )
+  price_series.sync_time_series()
+
+
+async def sync_data(missing_dates):
+  if len(missing_dates) > 0:
+    
+    fetcher = DataProcessing(dates=missing_dates, currency="USD")
+    
+    for index, complete_date in enumerate(fetcher.do_process_messages()):
+      print(f'done {complete_date}')
+      yield ((index + 1) / len(missing_dates)) * 100  # percent_completed
+
+
+def update_files():
+  analytics = DataAnalytics.do_analytics(DIR_DATA_MESSAGES)
+  analytics.dataframe.to_pickle(f"{DIR_DATA_ANALYTICS}/analytics.pickle")
+  with open(path.join(DIR_DATA_ANALYTICS, "all_orders.json"), 'w') as file:
+    file.write(json.dumps(analytics.orders))
+
+
+class DataStorage:
   __reporter_dates = None
   
   def reload_from_file(self):
+    print("getting missing dates")
     self.__reporter_dates = get_missing_dates(DIR_DATA_MESSAGES)
-    analytics = DataAnalytics(DIR_DATA_MESSAGES)
-    analytics.do_analytics()
-    analytics.dataframe.to_pickle(f"{DIR_DATA_ANALYTICS}/analytics.pickle")
+    print("loading data")
+    try:
+      self.analytics, self.series = load_data(DIR_DATA_ANALYTICS)
+    except FileNotFoundError as e:
+      print("no hay ficheros para cargar ... por favor sincronice o cargue los datos")
+      return
+    self.price_series, self.volumes_series = load_time_series(self.analytics, self.series)
     
-    with open(path.join(DIR_DATA_ANALYTICS, "/all_orders.json"), 'w') as file:
-      file.write(json.dumps(analytics.orders))
-  
-  def __init__(self, socketio):
-    self.socketio = socketio
-    self.__background_task = False
-    self.websocket_clientes = set()
-    
-    self.reload_from_file()
-    self.analytics, self.series = load_data(DIR_DATA_ANALYTICS)
-    self.price_series, self.volumes_series = load_time_series(
-      self.analytics, self.series
-    )
     (
       self.avg_daily_messages,
       _,
@@ -48,14 +69,34 @@ class DataStore:
     self.number_messages = get_time_serie_num_messages(self.analytics)
     self.daily_data = prepare_daily_data(self.analytics)
   
+  def __init__(self, socket_manager=None):
+    self.__background_task = False
+    self.websocket_clientes = set()
+    self.socket_manager = socket_manager
+    self.avg_daily_messages = None
+    self.percent_compra = None
+    self.percent_venta = None
+    self.price_series = None
+    self.volumes_series = None
+    self.analytics = None
+    self.series = None
+    self.number_messages = None
+    self.daily_data = None
+    self.reload_from_file()
+    self.global_state = None
+    self.update_global_state()
+  
+  def update_global_state(self):
+    self.global_state = str(datetime.datetime.now())
+  
   @property
   def background_task(self):
     return self.__background_task
   
-  @background_task.setter
-  def background_task(self, value):
-    self.__background_task = value
-    self.update_status()
+  async def update_background_task_status(self, value):
+    if self.__background_task != value:
+      self.__background_task = value
+      await self.update_status()
   
   @property
   def start_date(self):
@@ -74,55 +115,53 @@ class DataStore:
     ]
   
   @property
+  def processed_dates(self):
+    return [
+      day for (day, is_in)
+      in self.dates
+      if is_in == True
+    ]
+  
+  @property
   def dates(self):
     return self.__reporter_dates.dates
   
-  def update_status(self, socket_id=None):
-    self.socketio.emit(
+  async def update_status(self, socket_id=None):
+    if self.socket_manager is None:
+      return
+    await self.socket_manager.emit(
       "update", [
         self.background_task,
-        len(self.missing_dates)
+        len(self.missing_dates),
+        self.global_state,
       ], namespace="/",
       to=socket_id
     )
-    self.socketio.sleep(3)  # Esto es para dar tiempo a que el servidor procese otras peticiones
-
   
-  def sync_data(self):
+  async def sync_data(self):
     print("sync data....")
-    self.background_task = True
+    self.__reporter_dates = get_missing_dates(DIR_DATA_MESSAGES)  # super importante no quitar!!!
+    print(f"Missing dates found: [{', '.join(self.missing_dates)}]")
     
-    price_series = PriceTimeSeries(
-      self.start_date,
-      self.end_date,
-      DIR_DATA_ANALYTICS,
-      ["Compra", "Venta"],
-      currency="USD",
-    )
-    price_series.get_time_series()
-    
-    if len(self.missing_dates) > 0:
-      print(f"Missing dates found: {','.join(self.missing_dates)}")
+    await self.update_background_task_status(True)
+    try:
+      await fetch_time_series(self.start_date, self.end_date)
       
-      fetcher = DataProcessing(end_dates=self.missing_dates, currency="USD")
-      for index, complete_date in enumerate(fetcher.do_process_messages()):
-        print(f'done {complete_date}')
-        if index % 5 == 0:
-          self.reload_from_file()
-          self.update_status()
-      self.reload_from_file()
-    
-    self.background_task = False
+      async for update in sync_data(self.missing_dates):
+        await self.update_status(update)
+        self.reload_from_file()
+      update_files()
+      await self.update_background_task_status(False)
+    except Exception as exception:  # noqa
+      await self.update_background_task_status(False)
   
-  def connect(self, socket_id):
-    self.websocket_clientes.add(
-      socket_id
-    )
-    self.update_status(
-      socket_id
-    )
+  async def connect(self, socket_id):
+    self.websocket_clientes.add(socket_id)
+    await self.update_status(socket_id)
   
-  def disconnect(self, socket_id):
-    self.websocket_clientes.remove(
-      socket_id
-    )
+  async def disconnect(self, socket_id):
+    if socket_id in self.websocket_clientes:
+      self.websocket_clientes.remove(socket_id)
+
+
+data_store = DataStorage()

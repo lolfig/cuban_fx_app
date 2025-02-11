@@ -1,15 +1,21 @@
-def register_callbacks():
-  from . import (
-    navigation_drawer,
-    badge_indicator_missing_days,
-    badge_missing_days,
-    router_view,
-    graph_histogram_vol_price,
-    slot_messages_table,
-    websocket_events,
-    slot_fetch,
-    fetch_btn,
-    slot_git_hub_days_counter,
-    download_file,
-    upload_file
-  )
+from . import (
+  websocket,
+  slot_fetch,
+  router_view,
+  upload_file,
+  download_file,
+  number_messages,
+  slot_info_cards,
+  progressbar_row,
+  navigation_drawer,
+  badge_missing_days,
+  slot_messages_table,
+  slot_temporal_series,
+  slot_data_description,
+  dropdown_messages_date,
+  storage_background_task,
+  main_dashboard_container,
+  graph_histogram_vol_price,
+  slot_git_hub_days_counter,
+  badge_indicator_missing_days,
+)

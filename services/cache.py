@@ -4,12 +4,12 @@ from config.const import DIR_DATA_MESSAGES
 
 
 def load_data(path):
-  print("loading files")
   try:
     analytics = pd.read_pickle(f'{path}/analytics.pickle')
     serie = pd.read_pickle(f'{path}/USDCUP.pickle')
     return analytics, serie
   except FileNotFoundError as e:
+    print("No se encontraron los ficheros")
     raise e
 
 
