@@ -21,7 +21,7 @@ navigation_drawer = dbc.Offcanvas(
     dbc.ListGroup([
       dbc.ListGroupItem(
         className="d-flex justify-content-between align-items-start",
-        href="/",
+        href="/dash",
         children=[
           html.Div(
             className="ms-2 me-auto",
@@ -31,7 +31,7 @@ navigation_drawer = dbc.Offcanvas(
       ),
       dbc.ListGroupItem(
         className="d-flex justify-content-between align-items-start",
-        href="/load_data",
+        href="/dash/load_data",
         children=[
           html.Div(
             className="ms-2 me-auto",

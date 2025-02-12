@@ -1,7 +1,8 @@
 import dash_bootstrap_components as dbc
 from dash import callback, html
 
-from layouts.layout_dashboard import out_slot_messages_table, in_value_dropdown_messages_date
+from layouts.page_dashboard.outputs import out_slot_messages_table
+from layouts.page_dashboard.inputs import in_value_dropdown_messages_date
 from services import cache as tools_cache
 
 

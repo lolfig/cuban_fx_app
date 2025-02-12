@@ -10,11 +10,14 @@ class MessagesStep:
 
 
 @dataclass
-class ReporterDates:
+class DateExistenceReport:
   start_date: str
   end_date: str
   
   # all_data_days
-  dates: List[Tuple[str, bool]]
-  
-  
+  dates: List[
+    Tuple[
+      str  # date
+      , bool  # is in list
+    ]
+  ]

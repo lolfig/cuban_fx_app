@@ -1,10 +1,11 @@
-import app
+import uvicorn
+
+from data_storage import data_store  # noqa
 
 if __name__ == '__main__':
   print("Iniciando dashboard...")
-  
-  app.socketio.run(
-    app.server,
-    debug=True,
-    use_reloader=False,
+  uvicorn.run(
+    "app:app",
+    host='localhost',
+    port=8000
   )

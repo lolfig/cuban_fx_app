@@ -2,7 +2,7 @@ from dash import callback
 
 from config.const import SHOW_INLINE_BLOCK, HIDDE
 from layouts.layout_drawer import out_pack_slot_style_badge_missing_days
-from reactivity import in_storage_missing_data_counter
+from reactivity.storage.missing_data_counter import in_storage_missing_data_counter
 
 
 @callback(

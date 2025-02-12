@@ -2,7 +2,8 @@ from dash import callback
 from plotly import graph_objects as go
 
 from app import data_store
-from layouts.layout_dashboard import out_pack_figure_graphs, in_value_dropdown_date
+from layouts.page_dashboard.outputs import out_pack_figure_graphs
+from layouts.page_dashboard.inputs import in_value_dropdown_date
 from services import formaters
 
 
@@ -11,7 +12,9 @@ from services import formaters
   in_value_dropdown_date,
 )
 def update_daily_histograms(selected_date):
-  selected_date = formaters.from_string(selected_date)
+  if selected_date is None:
+    return {}, {}
+  
   if selected_date and (selected_date in data_store.daily_data):
     fig1 = go.Figure()
     fig1.add_trace(

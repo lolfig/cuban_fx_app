@@ -24,6 +24,7 @@ out_style_badge_indicator_missing_days = Output(badge_indicator_missing_days, "s
 
 drawer_menu_btn = dbc.Button(
   class_name='position-relative',
+  title="Show Menu",
   n_clicks=0,
   children=[
     DashIconify(
@@ -46,7 +47,7 @@ layout = dbc.Navbar(
         'Cuban Currency Market Dashboard',
         className="--bs-light-text-emphasis text-light"
       ),
-      href='/'
+      href='/dash'
     ),
     drawer_menu_btn
   ]),

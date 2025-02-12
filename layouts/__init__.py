@@ -1,5 +1,6 @@
 from . import (
-  layout_dashboard,
+  page_data_status,
+  page_dashboard,
   layout_drawer,
   layout_navbar
 )
