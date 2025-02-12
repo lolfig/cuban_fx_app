@@ -11,7 +11,7 @@ socket_manager = SocketManager(
   mount_location="/socket.io",  # este valor es obligatorio por dash_websocket.io
 )
 
-from store import data_store
+from data_storage import data_store
 
 data_store.socket_manager = socket_manager
 
@@ -30,7 +30,7 @@ from reactivity import (
   storage,
   websocket,
   router_view,
-  file_download,
+  file_download, sync_trigger,
 
 )
 
@@ -42,6 +42,7 @@ from layouts import (
 dash_app.layout = html.Div([
   url,
   websocket,
+  sync_trigger, # este es el trigger para sincronizar los datos
   storage.storage_missing_data_counter,
   storage.storage_background_task_progress,
   storage.storage_background_task,
@@ -57,14 +58,14 @@ import callback  # noqa
 
 # Now mount you dash server into main fastapi application
 @socket_manager.on("connect")
-async def handle_connect(sid, *args):
-  await data_store.connect(sid)
+def handle_connect(sid, *args):
+  data_store.connect(sid)
   print("Cliente conectado")
 
 
 @socket_manager.on("disconnect")
-async def handle_disconnect(sid, *args):
-  await data_store.disconnect(sid)
+def handle_disconnect(sid, *args):
+  data_store.disconnect(sid)
   print("Cliente desconectado")
 
 

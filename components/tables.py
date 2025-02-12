@@ -1,25 +1,25 @@
 import calendar
 
-from pandas import DataFrame
 import dash_bootstrap_components as dbc
 from dash import html
+from pandas import DataFrame
 
 from components.tools import color_by_value
 
 
 def table_head(title: str, data: DataFrame, col_with=4) -> dbc.Col:
-    return dbc.Col(
-        [
-            html.H4(title),
-            dbc.Table.from_dataframe(
-                data.round(2),
-                striped=True,
-                bordered=True,
-                hover=True,
-            ),
-        ],
-        width=col_with,
-    )
+  return dbc.Col(
+    [
+      html.H4(title),
+      dbc.Table.from_dataframe(
+        data.round(2),
+        striped=True,
+        bordered=True,
+        hover=True,
+      ),
+    ],
+    width=col_with,
+  )
 
 
 def create_table(df_pivot, year_selected):
@@ -81,11 +81,10 @@ def create_table(df_pivot, year_selected):
       ]) for ix, (year, week_day) in enumerate(resume.index)
   ])
   # Generar los elementos
-  elements = html.Table([
-    header,
-    rows
-  ],
+  elements = html.Table(
+    [header, rows],
     style={
+      "margin": "0 auto",
       "border-spacing": "3px",
       "overflow": "hidden",
       "position": "relative",

@@ -1,7 +1,8 @@
 from dash import Output
 
 from . import slot_messages_table, graph_histogram_vol_price, graph_supply_demand, slot_data_description, \
-  slot_temporal_series, slot_info_cards, dropdown_messages_date, number_messages, main_dashboard_container
+  slot_temporal_series, slot_info_cards, dropdown_messages_date, number_messages, main_dashboard_container, \
+  dropdown_date
 
 out_slot_messages_table = Output(slot_messages_table, "children")
 out_pack_figure_graphs = [
@@ -46,3 +47,24 @@ out_main_dashboard_container = Output(
   main_dashboard_container,
   "children"
 )
+
+out_options_dropdown_date = Output(
+  dropdown_date,
+  'options'
+)
+
+out_value_dropdown_date = Output(
+  dropdown_date,
+  "value"
+)
+
+out_disabled_dropdown_date = Output(
+  dropdown_date,
+  'disabled'
+)
+
+out_pack_dropdown_date = [
+  out_options_dropdown_date,
+  out_value_dropdown_date,
+  out_disabled_dropdown_date
+]

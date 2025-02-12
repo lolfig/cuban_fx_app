@@ -10,6 +10,7 @@ from config.const import (
 )
 # framework
 from services.framework_scraping.tools import fetcher
+from services.framework_scraping.tools.messages import interpret
 
 
 # types
@@ -71,7 +72,7 @@ class DataProcessing:
     
     self.currency = currency
   
-  def do_process_messages(self):
+  async def do_process_messages(self):
     """
     Processes raw messages to generate orders and save all information.
 
@@ -84,7 +85,7 @@ class DataProcessing:
     """
     for end_date in self.dates:
       start_date = end_date - datetime.timedelta(days=1)
-      raw_messages = fetcher.fetch_messages(
+      raw_messages = await fetcher.fetch_messages(
         currency=self.currency,
         start_moment=start_date,
         end_moment=end_date
@@ -95,7 +96,7 @@ class DataProcessing:
       )
       
       processed_data = [
-        messages.interpret(message_str)
+        interpret(message_str)
         for message_str
         in raw_messages.messages
       ]

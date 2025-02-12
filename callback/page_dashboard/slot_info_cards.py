@@ -1,21 +1,18 @@
-import dash
 import dash_bootstrap_components as dbc
 from dash import callback
 
 import components as my_components
-from layouts.page_dashboard.outputs import out_slot_info_cards
-from reactivity.storage.global_state import in_storage_global_state, state_storage_global_state
 from data_storage import data_store
+from layouts.page_dashboard.outputs import out_slot_info_cards
+from reactivity import in_sync_trigger
+from reactivity.storage.global_state import in_storage_global_state
 
 
 @callback(
   out_slot_info_cards,
-  in_storage_global_state,
-  state_storage_global_state
+  in_sync_trigger
 )
-def update_slot_info_cards(global_state, last_global_state):
-  if global_state == last_global_state:
-    return dash.no_update
+def update_slot_info_cards(n_clicks):
   if data_store.avg_daily_messages is None or data_store.percent_compra is None or data_store.percent_venta is None:
     return []
   

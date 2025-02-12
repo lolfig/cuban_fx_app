@@ -31,14 +31,7 @@ fully_space = [
   dbc.Row([dbc.Col([(
     dropdown_date := dbc.Select(
       id="date-dropdown",
-      options=(
-        elems := [
-          formaters.datetime_to_str(date)
-          for date in data_store.processed_dates
-        ]
-      ),
-      value=elems[-1] if len(elems) > 0 else None,
-      disabled=len(elems) == 0,
+    
     )
   
   )], width=12

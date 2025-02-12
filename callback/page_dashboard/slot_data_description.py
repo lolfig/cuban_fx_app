@@ -1,20 +1,17 @@
-import dash
 from dash import callback
 
 import components as my_components
 from app import data_store
 from layouts.page_dashboard.outputs import out_slot_data_description
-from reactivity.storage.global_state import in_storage_global_state, state_storage_global_state
+from reactivity import in_sync_trigger
+from reactivity.storage.global_state import in_storage_global_state
 
 
 @callback(
   out_slot_data_description,
-  in_storage_global_state,
-  state_storage_global_state
+  in_sync_trigger
 )
-def update_slot_data_description(global_state, last_global_state):
-  if global_state == last_global_state:
-    return dash.no_update
+def update_slot_data_description(n_clicks):
   if data_store.price_series is None or data_store.price_series.empty:
     return []
   

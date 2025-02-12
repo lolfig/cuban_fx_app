@@ -2,14 +2,16 @@
 import datetime
 
 # packages
-import requests
+import httpx
+from httpx import HTTPError
 
 from services import formaters
 # framework
 from services.framework_scraping.tools import const, types
 
 
-def fetch_messages(currency: str, start_moment: datetime.datetime, end_moment: datetime.datetime) -> types.MessagesStep:
+async def fetch_messages(currency: str, start_moment: datetime.datetime,
+                         end_moment: datetime.datetime) -> types.MessagesStep:
   """
   Downloads raw offer messages from the TOQUE website based on a specified currency and date range.
 
@@ -29,24 +31,25 @@ def fetch_messages(currency: str, start_moment: datetime.datetime, end_moment: d
   
   print(f"Fetching data for {end_str}")
   try:
-    response = requests.get(
-      f"{const.SOURCE_URL}?" + "&".join(
-        [
-          f"token={const.ACCESS_TOKEN}",
-          f"date_from={start_str}%2000:00:00",
-          f"date_to={end_str}%2000:00:00"
-        ]
-      ), timeout=5
-    )
-    response.raise_for_status()
-    messages = response.json()["statistics"][currency]["messages"]
+    async with httpx.AsyncClient() as client:
+      response = await client.get(
+        f"{const.SOURCE_URL}?" + "&".join(
+          [
+            f"token={const.ACCESS_TOKEN}",
+            f"date_from={start_str}%2000:00:00",
+            f"date_to={end_str}%2000:00:00"
+          ]
+        ), timeout=5
+      )
+      response.raise_for_status()
+      messages = response.json()["statistics"][currency]["messages"]
     
     return types.MessagesStep(
       end=end_str,
       start=start_str,
       messages=messages
     )
-  except requests.exceptions.HTTPError as error:
+  except HTTPError as error:
     print(f"HTTP error occurred: {error}")
     raise ConnectionError("Failed to fetch messages") from error
   except Exception as error:
@@ -54,7 +57,7 @@ def fetch_messages(currency: str, start_moment: datetime.datetime, end_moment: d
     raise Exception("An error occurred while fetching messages") from error
 
 
-def fetch_exchange_rate_data(api_url: str):
+async def fetch_exchange_rate_data(api_url: str):
   """
   Downloads exchange rate data from the specified API URL.
 
@@ -68,13 +71,14 @@ def fetch_exchange_rate_data(api_url: str):
         Dict[str, Any]: A dictionary containing the exchange rate data.
     """
   try:
-    response = requests.get(api_url, timeout=5)
-    response.raise_for_status()
-    data = response.json()
+    async with httpx.AsyncClient() as client:
+      response = await client.get(api_url, timeout=5)
+      response.raise_for_status()
+      data = response.json()
     if not data:
       raise ValueError("API response is empty")
     return data
-  except (requests.exceptions.RequestException, ValueError) as e:
+  except (HTTPError, ValueError) as e:
     print(f"Error fetching exchange rate data: {e}")
     raise ConnectionError("Failed to fetch exchange rate data") from e
   except Exception as error:

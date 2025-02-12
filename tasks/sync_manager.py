@@ -8,7 +8,9 @@ class SyncManager:
   
   @property
   def is_sync_running(self):
-    if self.loop is None or not self.loop.is_running():
+    if self.loop is None:
+      return False
+    elif not self.loop.is_running():
       return False
     return self.sync_data_task is not None and not self.sync_data_task.done()
   
@@ -64,12 +66,17 @@ class SyncManager:
           print(f"Error durante la cancelación: {e}")
       
       # Paso 3: Detener el event loop
-      if self.loop.is_running():
+      if self.loop is None:
+        print("Event loop no iniciado.")
+      
+      elif self.loop.is_running():
         self.loop.call_soon_threadsafe(self.loop.stop)
         print("Event loop detenido.")
       
+      if self.thread is None:
+        print("Hilo secundario no iniciado.")
       # Paso 4: Esperar a que el hilo termine
-      if self.thread.is_alive():
+      elif self.thread.is_alive():
         self.thread.join()
         print("Hilo secundario terminado.")
       
@@ -77,6 +84,15 @@ class SyncManager:
       self.loop = None
       self.thread = None
       self.sync_data_task = None
+      
+      self.start_event_loop()
+      if self.sync_data_task is None or self.sync_data_task.done():
+        # aquí notifico el background task
+        data_store.reload_from_file(True)
+        self.sync_data_task = asyncio.run_coroutine_threadsafe(
+          data_store.update_background_task_status(False),
+          self.loop
+        )
 
 
 sync_manager = SyncManager()

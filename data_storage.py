@@ -40,17 +40,17 @@ async def async_enumerate(iterable):
 
 async def sync_data(missing_dates):
   if len(missing_dates) > 0:
-    
     fetcher = DataProcessing(dates=missing_dates, currency="USD")
-    
     async for index, complete_date in async_enumerate(fetcher.do_process_messages()):
       print(f'done {complete_date}')
       yield ((index + 1) / len(missing_dates)) * 100  # percent_completed
 
 
-def update_files():
+def recreate_analytics():
   analytics = DataAnalytics.do_analytics(DIR_DATA_MESSAGES)
-  analytics.dataframe.to_pickle(f"{DIR_DATA_ANALYTICS}/analytics.pickle")
+  analytics.dataframe.to_pickle(
+    path.join(DIR_DATA_ANALYTICS, "analytics.pickle")
+  )
   with open(path.join(DIR_DATA_ANALYTICS, "all_orders.json"), 'w') as file:
     file.write(json.dumps(analytics.orders))
 
@@ -58,15 +58,23 @@ def update_files():
 class DataStorage:
   __reporter_dates = None
   
-  def reload_from_file(self):
+  def reload_from_file(self, recreate=False):
     print("getting missing dates")
     self.__reporter_dates = get_missing_dates(DIR_DATA_MESSAGES)
+    if recreate:
+      recreate_analytics()
     print("loading data")
     try:
-      self.analytics, self.series = load_data(DIR_DATA_ANALYTICS)
+      self.analytics, PriceTimeSeries_obj = load_data(DIR_DATA_ANALYTICS)
+      self.series = PriceTimeSeries_obj.toque_serie
     except FileNotFoundError as e:
-      print("no hay ficheros para cargar ... por favor sincronice o cargue los datos")
-      return
+      if len(self.processed_dates) > 0:
+        recreate_analytics()
+        self.analytics, PriceTimeSeries_obj = load_data(DIR_DATA_ANALYTICS)
+        self.series = PriceTimeSeries_obj.toque_serie
+      else:
+        print("no hay ficheros para cargar ... por favor sincronice o cargue los datos")
+        return
     self.price_series, self.volumes_series = generate_time_series(self.analytics, self.series)
     
     (
@@ -80,10 +88,14 @@ class DataStorage:
     self.number_messages = get_time_serie_num_messages(self.analytics)
     self.daily_data = prepare_daily_data(self.analytics)
   
-  def __init__(self, socket_manager=None):
+  def get_storage_update(self):
+    return self.sync_progress, self.background_task, len(self.missing_dates)
+  
+  def __init__(self, socket_manager: Optional[SocketManager] = None):
     self.__background_task = False
+    self.__sync_progress = 0
     self.websocket_clientes = set()
-    self.socket_manager: Optional[SocketManager] = socket_manager
+    self.socket_manager = socket_manager
     self.avg_daily_messages = None
     self.percent_compra = None
     self.percent_venta = None
@@ -93,15 +105,19 @@ class DataStorage:
     self.series = None
     self.number_messages = None
     self.daily_data = None
-    self.reload_from_file()
     self.global_state = None
+    self.reload_from_file()
     self.update_global_state()
   
   def update_global_state(self):
     self.global_state = str(datetime.datetime.now())
   
   @property
-  def background_task(self):
+  def sync_progress(self):
+    return self.__sync_progress
+  
+  @property
+  def background_task(self) -> bool:
     return self.__background_task
   
   async def update_background_task_status(self, value):
@@ -119,6 +135,9 @@ class DataStorage:
   
   @property
   def missing_dates(self):
+    if self.dates is None:
+      return []
+    
     return [
       day for (day, is_in)
       in self.dates
@@ -137,18 +156,20 @@ class DataStorage:
   def dates(self):
     return self.__reporter_dates.dates
   
-  async def update_status(self, /, update=None, socket_id=None):
+  async def update_status(self, *, update=None, socket_id=None):
+    self.update_global_state()
+    if update is not None:
+      self.__sync_progress = update
+    
     if self.socket_manager is None:
       return
     await self.socket_manager.emit(
       "update", [
-        self.background_task,
-        len(self.missing_dates),
         self.global_state,
       ], namespace="/",
       to=socket_id,
-      callback=lambda *args: print(args),
-      ignore_queue=True
+      # callback=lambda *args: print(args),
+      # ignore_queue=True
     )
     await asyncio.sleep(1)
     print("-" * 30)
@@ -169,12 +190,13 @@ class DataStorage:
       await fetch_time_series(self.start_date, self.end_date)
       
       async for update in sync_data(self.missing_dates):
-        await self.update_status(update)
-      update_files()
-      self.reload_from_file()
+        self.__reporter_dates = get_missing_dates(DIR_DATA_MESSAGES)  # super importante no quitar!!!
+        await self.update_status(update=update)
+      
+      self.reload_from_file(recreate=True)
       await self.update_background_task_status(False)
     except Exception as exception:  # noqa
-      self.reload_from_file()
+      self.reload_from_file(recreate=True)
       await self.update_background_task_status(False)
   
   def connect(self, socket_id):

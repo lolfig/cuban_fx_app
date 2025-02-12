@@ -15,7 +15,6 @@ def update_daily_histograms(selected_date):
   if selected_date is None:
     return {}, {}
   
-  selected_date = formaters.from_string(selected_date)
   if selected_date and (selected_date in data_store.daily_data):
     fig1 = go.Figure()
     fig1.add_trace(

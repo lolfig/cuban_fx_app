@@ -25,7 +25,7 @@ class PriceTimeSeries:
     self.toque_serie = pd.DataFrame()
     self.toque_all_info = {}
   
-  def sync_time_series(self):
+  async def sync_time_series(self):
     """
     Fetches, processes and Save!!! exchange rate data to create a time series DataFrame.
     
@@ -35,7 +35,7 @@ class PriceTimeSeries:
     """
     for offer in self.offers:
       api_url = self._construct_api_url(offer)
-      data_toque = fetch_exchange_rate_data(api_url)
+      data_toque = await fetch_exchange_rate_data(api_url)
       if data_toque is not None:
         self.toque_all_info[offer] = pd.DataFrame(data_toque)
         merged_df = self._process_offer_data(data_toque, offer)
@@ -45,8 +45,10 @@ class PriceTimeSeries:
           on='date',
           how='outer'
         ) if not self.toque_serie.empty else merged_df
+    
+    self.toque_serie.set_index('date', inplace=True)
+    
     self.save_data_info()
-    return self
   
   def _construct_api_url(self, offer: str) -> str:
     return (
@@ -91,7 +93,7 @@ class PriceTimeSeries:
       pickle.dump(self, file)  # noqa este file es writeable
   
   @staticmethod
-  def load_from_file(path, currency) -> "PriceTimeSeries":
+  def load_from_file(path, currency: CURRENCIES) -> "PriceTimeSeries":
     with open(
       os.path.join(
         path,

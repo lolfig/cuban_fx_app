@@ -1,28 +1,32 @@
 import pandas as pd
 
 from config.const import DIR_DATA_MESSAGES
+from services.framework_scraping.time_series_fetcher import PriceTimeSeries
 
 
 def load_data(path):
   try:
     analytics = pd.read_pickle(f'{path}/analytics.pickle')
-    serie = pd.read_pickle(f'{path}/USDCUP.pickle')
+    serie = PriceTimeSeries.load_from_file(path, 'USD')
     return analytics, serie
   except FileNotFoundError as e:
     print("No se encontraron los ficheros")
     raise e
 
 
-def load_time_series(analytics, series):
+def generate_time_series(analytics, series):
+  print("aqui")
+  marginal_price = analytics['Marginal_Data'].apply(lambda x: x[0]['price_mar'] if x else None)
+  marginal_price.index = pd.to_datetime(marginal_price.index)
   price_series = series.assign(
-    USDCUP_Marginal=analytics['Marginal_Data'].apply(lambda x: x[0]['price_mar'] if x else None)
+    USDCUP_Marginal=marginal_price
   )
   price_series.index = price_series.index.date
   
   volumes_series = analytics[['Volumen_Compra', 'Volumen_Venta', 'Volumen_Total']].assign(
     Volumen_Marginal=analytics['Marginal_Data'].apply(lambda x: x[0]['vol_mar'] if x else None)
   )
-  volumes_series.index = volumes_series.index.date
+  # volumes_series.index = volumes_series.index.date
   
   return price_series, volumes_series
 

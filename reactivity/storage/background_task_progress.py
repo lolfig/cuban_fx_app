@@ -3,7 +3,7 @@ from dash.dcc import Store
 
 storage_background_task_progress = Store(
   id='storage_background_task_progress',
-  data=30
+  data=0
 )
 in_storage_background_task_progress = Input(
   storage_background_task_progress,
@@ -12,5 +12,5 @@ in_storage_background_task_progress = Input(
 out_storage_background_task_progress = Output(
   storage_background_task_progress,
   "data",
-  allow_duplicate=True,
+  allow_duplicate=True
 )

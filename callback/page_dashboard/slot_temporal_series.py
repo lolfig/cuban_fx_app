@@ -1,21 +1,17 @@
-import dash
 import dash_bootstrap_components as dbc
 from dash import callback, dcc
 from plotly import express as px
 
 from data_storage import data_store
 from layouts.page_dashboard.outputs import out_slot_temporal_series
-from reactivity.storage.global_state import in_storage_global_state, state_storage_global_state
+from reactivity import in_sync_trigger
 
 
 @callback(
   out_slot_temporal_series,
-  in_storage_global_state,
-  state_storage_global_state
+  in_sync_trigger
 )
-def update_slot_temporal_series(global_state, last_global_state):
-  if global_state == last_global_state:
-    return dash.no_update
+def update_slot_temporal_series(n_clicks):
   if data_store.price_series is None or data_store.volumes_series is None:
     return []
   
