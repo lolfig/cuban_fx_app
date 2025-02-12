@@ -1,11 +1,15 @@
+import asyncio
 import datetime
 import json
 from os import path
+from typing import Optional
+
+from fastapi_socketio import SocketManager
 
 from config.const import DIR_DATA_MESSAGES, DIR_DATA_ANALYTICS
 from services.cache import (
   load_data,
-  load_time_series,
+  generate_time_series,
   get_messages_metrics,
   get_time_serie_num_messages,
   prepare_daily_data
@@ -24,7 +28,14 @@ async def fetch_time_series(start_date, end_date):
     ["Compra", "Venta"],
     currency="USD",
   )
-  price_series.sync_time_series()
+  await price_series.sync_time_series()
+
+
+async def async_enumerate(iterable):
+  index = 0
+  async for item in iterable:
+    yield index, item
+    index += 1
 
 
 async def sync_data(missing_dates):
@@ -32,7 +43,7 @@ async def sync_data(missing_dates):
     
     fetcher = DataProcessing(dates=missing_dates, currency="USD")
     
-    for index, complete_date in enumerate(fetcher.do_process_messages()):
+    async for index, complete_date in async_enumerate(fetcher.do_process_messages()):
       print(f'done {complete_date}')
       yield ((index + 1) / len(missing_dates)) * 100  # percent_completed
 
@@ -56,7 +67,7 @@ class DataStorage:
     except FileNotFoundError as e:
       print("no hay ficheros para cargar ... por favor sincronice o cargue los datos")
       return
-    self.price_series, self.volumes_series = load_time_series(self.analytics, self.series)
+    self.price_series, self.volumes_series = generate_time_series(self.analytics, self.series)
     
     (
       self.avg_daily_messages,
@@ -72,7 +83,7 @@ class DataStorage:
   def __init__(self, socket_manager=None):
     self.__background_task = False
     self.websocket_clientes = set()
-    self.socket_manager = socket_manager
+    self.socket_manager: Optional[SocketManager] = socket_manager
     self.avg_daily_messages = None
     self.percent_compra = None
     self.percent_venta = None
@@ -126,7 +137,7 @@ class DataStorage:
   def dates(self):
     return self.__reporter_dates.dates
   
-  async def update_status(self, socket_id=None):
+  async def update_status(self, /, update=None, socket_id=None):
     if self.socket_manager is None:
       return
     await self.socket_manager.emit(
@@ -135,8 +146,18 @@ class DataStorage:
         len(self.missing_dates),
         self.global_state,
       ], namespace="/",
-      to=socket_id
+      to=socket_id,
+      callback=lambda *args: print(args),
+      ignore_queue=True
     )
+    await asyncio.sleep(1)
+    print("-" * 30)
+    print("update: " + str([
+      self.background_task,
+      len(self.missing_dates),
+      self.global_state,
+    ]))
+    print("-" * 30)
   
   async def sync_data(self):
     print("sync data....")
@@ -149,17 +170,17 @@ class DataStorage:
       
       async for update in sync_data(self.missing_dates):
         await self.update_status(update)
-        self.reload_from_file()
       update_files()
+      self.reload_from_file()
       await self.update_background_task_status(False)
     except Exception as exception:  # noqa
+      self.reload_from_file()
       await self.update_background_task_status(False)
   
-  async def connect(self, socket_id):
+  def connect(self, socket_id):
     self.websocket_clientes.add(socket_id)
-    await self.update_status(socket_id)
   
-  async def disconnect(self, socket_id):
+  def disconnect(self, socket_id):
     if socket_id in self.websocket_clientes:
       self.websocket_clientes.remove(socket_id)
 

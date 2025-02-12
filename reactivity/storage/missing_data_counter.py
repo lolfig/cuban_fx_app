@@ -5,7 +5,8 @@ from app import data_store
 
 storage_missing_data_counter = Store(
   id='missing_data_counter_storage',
-  data=len(data_store.missing_dates)
+  data=len(data_store.missing_dates),
+  allow_duplicate=True
 )
 out_storage_missing_data_counter = Output(
   storage_missing_data_counter,

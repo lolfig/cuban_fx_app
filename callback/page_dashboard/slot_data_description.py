@@ -3,7 +3,7 @@ from dash import callback
 
 import components as my_components
 from app import data_store
-from layouts.layout_dashboard.outputs import out_slot_data_description
+from layouts.page_dashboard.outputs import out_slot_data_description
 from reactivity.storage.global_state import in_storage_global_state, state_storage_global_state
 
 

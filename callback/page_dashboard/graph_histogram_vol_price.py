@@ -2,8 +2,8 @@ from dash import callback
 from plotly import graph_objects as go
 
 from app import data_store
-from layouts.layout_dashboard.outputs import out_pack_figure_graphs
-from layouts.layout_dashboard.inputs import in_value_dropdown_date
+from layouts.page_dashboard.outputs import out_pack_figure_graphs
+from layouts.page_dashboard.inputs import in_value_dropdown_date
 from services import formaters
 
 

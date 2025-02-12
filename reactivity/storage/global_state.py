@@ -13,7 +13,8 @@ in_storage_global_state = Input(
 
 out_storage_global_state = Output(
   storage_global_state,
-  'data'
+  'data',
+  allow_duplicate=True
 )
 state_storage_global_state = State(
   storage_global_state,

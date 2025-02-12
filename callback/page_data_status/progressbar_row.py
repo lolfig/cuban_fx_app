@@ -1,6 +1,6 @@
 from dash import callback
 
-from layouts.layout_data_status.progressbar_row.outputs import out_value_progressbar__sync_running
+from layouts.page_data_status.progressbar_row.outputs import out_value_progressbar__sync_running
 from reactivity.storage.background_task_progress import in_storage_background_task_progress
 from reactivity.storage.background_task import in_storage_background_task
 

@@ -6,7 +6,8 @@ from app import data_store
 storage_background_task = Store(
   id='storage_background_task',
   # data=data_store.background_task
-  data=data_store.background_task
+  data=data_store.background_task,
+  allow_duplicate=True
 )
 in_storage_background_task = Input(
   storage_background_task,

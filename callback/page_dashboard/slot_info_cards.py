@@ -3,9 +3,9 @@ import dash_bootstrap_components as dbc
 from dash import callback
 
 import components as my_components
-from layouts.layout_dashboard.outputs import out_slot_info_cards
+from layouts.page_dashboard.outputs import out_slot_info_cards
 from reactivity.storage.global_state import in_storage_global_state, state_storage_global_state
-from store import data_store
+from data_storage import data_store
 
 
 @callback(

@@ -1,7 +1,7 @@
 from dash import callback
 
-from layouts.layout_data_status.progressbar_row import fetch_btn, stop_sync_btn
-from layouts.layout_data_status.progressbar_row.outputs import out_slot_slot_fetch
+from layouts.page_data_status.progressbar_row import fetch_btn, stop_sync_btn
+from layouts.page_data_status.progressbar_row.outputs import out_slot_slot_fetch
 from reactivity.storage.background_task import in_storage_background_task
 
 

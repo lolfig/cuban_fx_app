@@ -1,10 +1,10 @@
 import dash
 from dash import callback
 
-from layouts.layout_dashboard import empty_space, fully_space
-from layouts.layout_dashboard.outputs import out_main_dashboard_container
+from layouts.page_dashboard import empty_space, fully_space
+from layouts.page_dashboard.outputs import out_main_dashboard_container
 from reactivity.storage.global_state import in_storage_global_state, state_storage_global_state
-from store import data_store
+from data_storage import data_store
 
 
 

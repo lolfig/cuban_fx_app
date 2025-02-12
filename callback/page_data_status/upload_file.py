@@ -4,7 +4,7 @@ from os import path
 from dash import callback
 
 from config.const import DIR_DATA_MESSAGES
-from layouts.layout_data_status.control_panel import in_pack_upload_btn
+from layouts.page_data_status.control_panel import in_pack_upload_btn
 
 
 def parse_contents(content, filename, date):
