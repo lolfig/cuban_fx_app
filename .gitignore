@@ -6,3 +6,6 @@
 **.env
 **.venv**
 **.code-workspace
+.conda**
+**.zip
+**__pycache__**
