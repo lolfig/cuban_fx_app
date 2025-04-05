@@ -39,8 +39,22 @@ navigation_drawer = dbc.Offcanvas(
           ),
           badge_missing_days
         ]
+      ),
+      html.Div(style={'flex': '1'}),
+      html.Form(
+        action="/logout",
+        method="post",
+        children=[
+          dbc.Button(
+            "Logout",
+            type="submit",
+            color="danger",
+            className="w-100 mt-3"
+          )
+        ],
+        style={'padding': '1rem'}
       )
-    ]),
+    ], style={'height': '100%', 'display': 'flex', 'flexDirection': 'column'}),
   ]
 )
 

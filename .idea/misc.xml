@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="cuban_fx_app" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="cuban_fx_app" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="cuba-fx-app" project-jdk-type="Python SDK" />
 </project>
