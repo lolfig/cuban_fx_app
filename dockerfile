@@ -10,8 +10,8 @@ COPY . /app
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expone un puerto (si es necesario, por ejemplo, para una app web)
-EXPOSE 5000
+# Expone el puerto 8000 para uvicorn
+EXPOSE 8000
 
 # Define el comando por defecto al iniciar el contenedor
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
