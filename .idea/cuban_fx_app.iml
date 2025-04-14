@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/gpt_examples" />
     </content>
-    <orderEntry type="jdk" jdkName="cuban_fx_app" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="cuba-fx-app" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
