@@ -70,3 +70,4 @@ def handle_disconnect(sid, *args):
 
 
 app.mount("/dash", WSGIMiddleware(dash_app.server))
+import routes # noqa
