@@ -1,0 +1,73 @@
+GUÍA DE DESPLIEGUE PARA LA APLICACIÓN CUBAN FX
+=============================================
+
+1. REQUISITOS PREVIOS
+-------------------
+- Python 3.12.3
+- Docker y Docker Compose (recomendado)
+- Git (para control de versiones)
+
+2. CONFIGURACIÓN DE DESARROLLO LOCAL
+---------------------------------
+A. Usando Python directamente:
+1. Crear y activar un entorno virtual:
+   python3 -m venv .venv
+   source .venv/bin/activate
+
+2. Instalar dependencias:
+   pip install -r requirements.txt
+
+3. Ejecutar la aplicación:
+   python main.py
+
+La aplicación estará disponible en http://localhost:8000
+
+B. Usando Docker (Recomendado):
+1. Construir y ejecutar los contenedores:
+   docker-compose up --build
+
+La aplicación estará disponible en http://localhost:8000
+
+3. ESTRUCTURA DEL PROYECTO
+------------------------
+- La aplicación utiliza FastAPI con Dash para el frontend
+- Integración de WebSocket para actualizaciones en tiempo real
+- Almacenamiento de datos usando archivos Parquet
+- Tareas en segundo plano gestionadas por Celery
+
+4. GESTIÓN DE DATOS
+-----------------
+- Los archivos de datos se almacenan en formato Parquet
+- Funcionalidad de carga disponible a través de la interfaz de usuario
+- Funcionalidad de descarga para respaldar datos
+- Sincronización automática de datos disponible
+
+5. MONITOREO
+-----------
+- La aplicación incluye una barra de progreso para operaciones de sincronización
+- Monitoreo del estado de tareas en segundo plano
+- Contador de datos faltantes
+- Visualización de datos estilo GitHub
+
+6. CONFIGURACIÓN DEL ENTORNO
+--------------------------
+- Crear un archivo .env en el directorio raíz si es necesario
+- Asegurar que todas las variables de entorno requeridas estén configuradas
+
+7. CONSIDERACIONES PARA DESPLIEGUE EN PRODUCCIÓN
+---------------------------------------------
+1. Establecer variables de entorno apropiadas
+2. Configurar medidas de seguridad adecuadas
+3. Configurar registro de logs apropiado
+4. Configurar estrategias de respaldo de datos
+5. Considerar usar un proxy inverso (nginx/apache)
+6. Configurar certificados SSL/TLS
+
+8. MANTENIMIENTO
+--------------
+- Respaldos regulares de archivos Parquet
+- Monitorear recursos del sistema
+- Mantener dependencias actualizadas
+- Revisar logs regularmente
+
+Nota: Esta es una aplicación enfocada al desarrollo con capacidades de procesamiento de datos en tiempo real. Asegure medidas de seguridad apropiadas antes de desplegar en producción.
