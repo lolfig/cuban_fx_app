@@ -1,4 +1,26 @@
-data
-.idea
-.vscode
-.git
+# Exclude Python cache files and directories
+__pycache__/
+*.pyc
+*.pyo
+
+# Exclude version control directories
+.git/
+
+# Exclude Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Exclude data and logs
+notebook/data/
+data/
+logs/
+
+# Exclude other unnecessary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+.idea/
+.vscode/
+venv/
+env/
