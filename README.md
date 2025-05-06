@@ -1,63 +1,116 @@
-# Cuban FX Market Analytics Dashboard
+# Cuban FX Market Analysis Dashboard
 
-A Python-based web application that scrapes, processes, and analyzes foreign exchange market data from social media, performs statistical simulations, and visualizes key market metrics through an interactive dashboard.
+## Description
+Este proyecto es una aplicación web que analiza el mercado cambiario a través de técnicas avanzadas de web scraping, análisis de datos y visualización. La aplicación recolecta, procesa y visualiza datos del mercado cambiario en tiempo real, proporcionando insights valiosos sobre tendencias y patrones del mercado.
 
-## Features
+## Características Principales
+- 🔍 **Web Scraping de Redes Sociales**
+  - Extracción automática de mensajes relacionados con el mercado cambiario
+  - Monitoreo continuo de múltiples fuentes de datos
+  - Sistema robusto de recolección de datos
 
-- **Web Scraping**: Extracts currency exchange messages from social media platforms
-- **Data Processing**: Cleans and structures raw market data for analysis
-- **Economic Modeling**:
-  - Walrasian auction simulations
-  - Hidden Markov models for market state detection
-  - Empirical Mode Decomposition for time series analysis
-- **Interactive Dashboard**:
-  - Real-time market metrics visualization
-  - Time series plots of prices and volumes
-  - Supply and demand curves
-  - Statistical distributions (histograms)
-  - Model visualizations
+- 🧹 **Procesamiento de Datos**
+  - Limpieza y normalización de mensajes
+  - Extracción de información relevante (precios, volúmenes, fechas)
+  - Validación y control de calidad de datos
 
-## Project Structure
+- 📊 **Análisis Estadístico**
+  - Simulación de subastas Walrasianas
+  - Generación de estadísticas de mercado
+  - Almacenamiento eficiente de datos históricos
+
+- 📈 **Dashboard Interactivo**
+  - Series temporales de precios y volúmenes
+  - Histogramas de distribución
+  - Curvas de oferta y demanda
+  - Modelo Oculto de Markov
+  - Descomposición de Modo Empírico
+  - Métricas en tiempo real del mercado
+
+## Requisitos del Sistema
+- Python 3.11+
+- Docker y Docker Compose
+- Conexión a Internet estable
+
+## Instalación
+
+1. Clonar el repositorio:
+```bash
+git clone [URL_DEL_REPOSITORIO]
+cd cuban_fx_app
+```
+
+2. Crear y activar un entorno virtual:
+```bash
+python -m venv venv
+source venv/bin/activate  # En Linux/Mac
+# o
+.\venv\Scripts\activate  # En Windows
+```
+
+3. Instalar dependencias:
+```bash
+pip install -r requirements.txt
+```
+
+4. Configurar variables de entorno:
+```bash
+cp .env.example .env
+# Editar .env con las configuraciones necesarias
+```
+
+5. Iniciar con Docker:
+```bash
+docker-compose up -d
+```
+
+## Uso
+
+1. Iniciar la aplicación:
+```bash
+python main.py
+```
+
+2. Acceder al dashboard:
+- Abrir navegador web
+- Visitar `http://localhost:8050`
+
+## Estructura del Proyecto
+
+```
 cuban_fx_app/
-├── app.py # Main application entry point
-├── assets/ # Static assets (images, CSS, etc.)
-├── callback/ # Dash callback functions
-├── components/ # Reusable UI components
-├── config/ # Configuration files
-├── data/ # Data storage and processing
-│ ├── raw/ # Raw scraped data
-│ ├── processed/ # Cleaned and processed data
-│ └── simulations/ # Simulation results
-├── data_storage.py # Data persistence utilities
-├── layouts/ # Dashboard page layouts
-├── notebook/ # Jupyter notebooks for analysis
-├── reactivity/ # Reactive components
-├── routes/ # Application routing
-├── services/ # Business logic services
-│ ├── scraping/ # Web scraping services
-│ ├── analysis/ # Statistical analysis
-│ └── simulation/ # Economic simulations
-├── tasks/ # Background tasks
-├── tests/ # Unit and integration tests
-├── docker-compose.yml # Docker compose configuration
-├── dockerfile # Docker configuration
-├── main.py # Alternative entry point
-├── Makefile # Build automation
-├── requirements.txt # Python dependencies
-└── README.md # This file
+├── app.py                  # Aplicación principal Dash
+├── data_storage.py         # Gestión de almacenamiento
+├── services/              # Servicios principales
+│   ├── framework_scraping/  # Módulos de web scraping
+│   └── framework_analytics/ # Módulos de análisis
+├── callback/             # Callbacks de Dash
+├── components/           # Componentes reutilizables
+├── layouts/             # Layouts de la interfaz
+└── assets/             # Recursos estáticos
+```
 
+## Contribución
+1. Fork del repositorio
+2. Crear rama para feature: `git checkout -b feature/nueva-caracteristica`
+3. Commit cambios: `git commit -am 'Añadir nueva característica'`
+4. Push a la rama: `git push origin feature/nueva-caracteristica`
+5. Crear Pull Request
 
-## Prerequisites
+## Tecnologías Utilizadas
+- Python
+- Dash
+- Pandas
+- Numpy
+- Scipy
+- Plotly
+- Beautiful Soup/Selenium
+- SQLAlchemy
+- Docker
 
-- Python 3.11.11
-- PostgreSQL (or your preferred database) <!-- Specify if you use a different DB -->
-- Redis (for caching, if applicable) <!-- Remove if not used -->
-- Chrome/Firefox for web scraping
+## Licencia
+[Especificar tipo de licencia]
 
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/cuban_fx_app.git
-   cd cuban_fx_app
+## Contacto
+[Información de contacto del mantenedor]
 
