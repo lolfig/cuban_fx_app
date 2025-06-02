@@ -78,6 +78,7 @@ navigation_drawer = dbc.Offcanvas(
               DashIconify(
                 icon="mdi:cog",
                 className="me-2",
+                width=20
               ),
               "Configuración"
             ]
