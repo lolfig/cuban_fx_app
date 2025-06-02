@@ -1,6 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import html, Output, State
-
+from dash_iconify import DashIconify
 from config.const import MISSING_DATE_BADGE_COLOR
 
 badge_missing_days = dbc.Badge(
@@ -38,6 +38,23 @@ navigation_drawer = dbc.Offcanvas(
             children="Datos Cargados"
           ),
           badge_missing_days
+        ]
+      ),
+      dbc.ListGroupItem(
+        className="d-flex justify-content-between align-items-start",
+        href="/dash/settings",
+        children=[
+          html.Div(
+            className="ms-2 me-auto",
+            children=[
+              DashIconify(
+                icon="mdi:cog",
+                className="me-2",
+                width=20
+              ),
+              "Configuración"
+            ]
+          )
         ]
       ),
       html.Div(style={'flex': '1'}),

@@ -6,5 +6,6 @@ from . import (
   badge_missing_days,
   badge_indicator_missing_days,
   page_data_status,
-  page_dashboard
+  page_dashboard,
+  page_settings
 )

@@ -3,6 +3,10 @@ from typing import List
 
 import pandas as pd
 
+
+#nuevo
+import asyncio
+from services.framework_scraping.tools.telegram_scrap.telegram_scrap import scrape_telegram
 # const
 from config.const import (
   CURRENCIES,
@@ -85,6 +89,24 @@ class DataProcessing:
     """
     for end_date in self.dates:
       start_date = end_date - datetime.timedelta(days=1)
+      # Run both fetchers concurrently
+      tasks = [
+          fetcher.fetch_messages(
+              currency=self.currency,
+              start_moment=start_date,
+              end_moment=end_date
+          ),
+          scrape_telegram(
+              [
+                  'https://t.me/compra_venta_mlc_cu/',
+                  'https://t.me/CriptoIntercambio_Cuba/'
+              ],
+              ''
+          )
+      ]
+      
+      # Wait for both tasks to complete
+      await asyncio.gather(*tasks)
       raw_messages = await fetcher.fetch_messages(
         currency=self.currency,
         start_moment=start_date,
