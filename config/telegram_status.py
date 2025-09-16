@@ -10,12 +10,18 @@ def _ensure_dir():
 
 
 def load_status():
+    _ensure_dir()
     if os.path.exists(STATUS_FILE):
         try:
             with open(STATUS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, dict):
+                    return data
         except Exception:
-            return {}
+            pass
+    # Si no existe o está corrupto, crear archivo vacío
+    with open(STATUS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
     return {}
 
 
