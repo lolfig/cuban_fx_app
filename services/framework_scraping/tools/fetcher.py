@@ -50,7 +50,9 @@ async def fetch_messages(currency: str, start_moment: datetime.datetime,
       messages=messages
     )
   except HTTPError as error:
-    print(f"HTTP error occurred: {error}")
+    print(f"HTTP error occurred: {error!r}")  # Usar !r para mostrar la representación completa
+    if hasattr(error, 'response') and error.response is not None:
+        print("Response content:", error.response.text)
     raise ConnectionError("Failed to fetch messages") from error
   except Exception as error:
     print(f"An error occurred: {error}")

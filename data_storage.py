@@ -41,6 +41,7 @@ async def async_enumerate(iterable):
 
 
 async def sync_data(missing_dates):
+    print("dentro de sync_data")
     if len(missing_dates) > 0:
         fetcher = DataProcessing(dates=missing_dates, currency="USD")
         async for index, complete_date in async_enumerate(
@@ -51,8 +52,11 @@ async def sync_data(missing_dates):
 
 
 def recreate_analytics():
+    # print("dentro de recreate_analytics")
     analytics = DataAnalytics.do_analytics(DIR_DATA_MESSAGES)
+    # print("paso el do_analytics")
     analytics.dataframe.to_pickle(path.join(DIR_DATA_ANALYTICS, "analytics.pickle"))
+    # print("paso el to_pickle")
     with open(path.join(DIR_DATA_ANALYTICS, "all_orders.json"), "w") as file:
         file.write(json.dumps(analytics.orders))
 
@@ -61,16 +65,20 @@ class DataStorage:
     __reporter_dates = None
 
     def reload_from_file(self, recreate=False):
-        print("getting missing dates")
+        # print("getting missing dates")
         self.__reporter_dates = get_missing_dates(DIR_DATA_MESSAGES)
+        # print("paso el get_missing_dates")
         if recreate:
+            # print("dentro del if")
             recreate_analytics()
         print("loading data")
         try:
+            # print("dentro del try")
             self.analytics, PriceTimeSeries_obj = load_data(DIR_DATA_ANALYTICS)
             self.series = PriceTimeSeries_obj.toque_serie
             self.all_info = PriceTimeSeries_obj.toque_all_info
         except FileNotFoundError as e:
+            # print("dentro del except")
             if len(self.processed_dates) > 0:
                 recreate_analytics()
                 self.analytics, PriceTimeSeries_obj = load_data(DIR_DATA_ANALYTICS)
@@ -209,7 +217,7 @@ class DataStorage:
                     DIR_DATA_MESSAGES
                 )  # super importante no quitar!!!
                 await self.update_status(update=update)
-
+                print("update: ", update)
             self.reload_from_file(recreate=True)
             await self.update_background_task_status(False)
         except Exception as exception:  # noqa

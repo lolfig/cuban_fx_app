@@ -6,5 +6,7 @@ from . import (
   badge_missing_days,
   badge_indicator_missing_days,
   page_data_status,
-  page_dashboard
+  page_dashboard,
+  page_settings
 )
+from .page_data_status_telegram import __init__ as _page_data_status_telegram  # registra callbacks de la página de Telegram

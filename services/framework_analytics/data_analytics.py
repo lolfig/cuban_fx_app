@@ -8,6 +8,7 @@ from services.framework_analytics.analytics_utils import find_marginal_price
 
 
 def _extract_orders(df):
+  
   """
   Extracts buy and sell orders from the DataFrame.
 

@@ -96,13 +96,13 @@ class DataProcessing:
               start_moment=start_date,
               end_moment=end_date
           ),
-          scrape_telegram(
-              [
-                  'https://t.me/compra_venta_mlc_cu/',
-                  'https://t.me/CriptoIntercambio_Cuba/'
-              ],
-              ''
-          )
+          # scrape_telegram(
+          #     [
+          #         'https://t.me/compra_venta_mlc_cu/',
+          #         'https://t.me/CriptoIntercambio_Cuba/'
+          #     ],
+          #     ''
+          # )
       ]
       
       # Wait for both tasks to complete

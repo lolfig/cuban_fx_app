@@ -7,7 +7,15 @@ import builtins
 import time
 from datetime import datetime, timezone
 from telethon.sync import TelegramClient
-from .info import username, phone, api_id, api_hash
+from config.settings import load_config
+from config.telegram_status import update_channel_status
+
+# Cargar configuración
+config = load_config()
+username = config['username']
+phone = config['phone']
+api_id = config['api_id']
+api_hash = config['api_hash']
 import pickle
 import pandas as pd
 # Configuración global
@@ -62,7 +70,7 @@ def guardar_mensajes_por_dia(grupo, mensajes):
         print(f"Guardado archivo: {nombre_archivo}")
 
 # Raspado principal
-async def scrape_telegram(canales, clave_busqueda, max_reintentos=3):
+async def scrape_telegram(channels, session_file):
     with open(nombre_archivo_json, 'r', encoding='utf-8') as f:
         mensajes_existentes = json.load(f)
 
@@ -107,6 +115,15 @@ async def scrape_telegram(canales, clave_busqueda, max_reintentos=3):
 
                     guardar_mensajes_por_dia(canal, mensajes_nuevos)
                     print(f"Total mensajes capturados en {canal}: {len(mensajes_nuevos)}\n")
+                    
+                    # Actualizar estado del canal en archivo JSON (éxito)
+                    update_channel_status(
+                        canal,
+                        status="ok",
+                        new_messages=len(mensajes_nuevos),
+                        total_messages=len(mensajes_existentes),
+                        last_error=""
+                    )
                     break  # Terminó bien, salimos del bucle de reintento
 
                 except Exception as e:
@@ -114,6 +131,14 @@ async def scrape_telegram(canales, clave_busqueda, max_reintentos=3):
                     reintento += 1
                     if reintento > max_reintentos:
                         print(f"Máximo número de reintentos alcanzado para {canal}. Saltando...")
+                        # Actualizar estado del canal en archivo JSON (fallo final)
+                        update_channel_status(
+                            canal,
+                            status="error",
+                            new_messages=0,
+                            total_messages=len(mensajes_existentes),
+                            last_error=str(e)
+                        )
                     else:
                         print(f"Reintentando {canal} ({reintento}/{max_reintentos})...")
                     await asyncio.sleep(5)
