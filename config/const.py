@@ -21,3 +21,6 @@ DEACTIVATE_INTERVAL = True
 MISSING_DATE_BADGE_COLOR = "danger"
 SHOW_INLINE_BLOCK = {"display": "inline-block"}
 HIDDE = {"display": "none"}
+
+# Timeout por defecto para el lock de scrapers (None => espera indefinida)
+SCRAPER_LOCK_TIMEOUT_SEC = None

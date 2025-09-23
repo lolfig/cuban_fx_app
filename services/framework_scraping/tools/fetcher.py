@@ -8,6 +8,7 @@ from httpx import HTTPError
 from services import formaters
 # framework
 from services.framework_scraping.tools import const, types
+from config.settings import load_config
 
 
 async def fetch_messages(currency: str, start_moment: datetime.datetime,
@@ -33,7 +34,13 @@ async def fetch_messages(currency: str, start_moment: datetime.datetime,
   try:
     # Espera hasta adquirir el lock (mutua exclusión con otros scrapers)
     from services.framework_scraping.locks import AsyncFileLock, DEFAULT_LOCK_PATH
-    async with AsyncFileLock(DEFAULT_LOCK_PATH, poll_interval=0.5, timeout=None):
+
+    cfg = load_config()
+    timeout = cfg.get('lock_timeout_sec', None)
+    if timeout is None:
+      timeout = const.SCRAPER_LOCK_TIMEOUT_SEC
+
+    async with AsyncFileLock(DEFAULT_LOCK_PATH, poll_interval=0.5, timeout=timeout):
       async with httpx.AsyncClient() as client:
         response = await client.get(
           f"{const.SOURCE_URL}?" + "&".join(

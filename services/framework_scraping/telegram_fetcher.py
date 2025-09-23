@@ -26,7 +26,13 @@ async def fetch_telegram_messages(
     
     # Espera hasta adquirir el lock antes de raspar Telegram
     from services.framework_scraping.locks import AsyncFileLock, DEFAULT_LOCK_PATH
-    async with AsyncFileLock(DEFAULT_LOCK_PATH, poll_interval=0.5, timeout=None):
+    from config.const import SCRAPER_LOCK_TIMEOUT_SEC
+
+    timeout = config.get('lock_timeout_sec', None)
+    if timeout is None:
+        timeout = SCRAPER_LOCK_TIMEOUT_SEC
+
+    async with AsyncFileLock(DEFAULT_LOCK_PATH, poll_interval=0.5, timeout=timeout):
         # Execute the scraper
         await scrape_telegram(channels, '')
     

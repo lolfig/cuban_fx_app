@@ -11,7 +11,8 @@ DEFAULT_CONFIG = {
     'channels': [],
     'update_interval': 5,
     'history_days': 30,
-    'daily_run_time': ''  # opcional, formato "HH:MM", vacío si no se usa
+    'daily_run_time': '',  # opcional, formato "HH:MM", vacío si no se usa
+    'lock_timeout_sec': None  # opcional: None => espera indefinida; número => segundos de espera máximo
 }
 
 def load_config():
