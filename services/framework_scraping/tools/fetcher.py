@@ -31,24 +31,27 @@ async def fetch_messages(currency: str, start_moment: datetime.datetime,
   
   print(f"Fetching data for {end_str}")
   try:
-    async with httpx.AsyncClient() as client:
-      response = await client.get(
-        f"{const.SOURCE_URL}?" + "&".join(
-          [
-            f"token={const.ACCESS_TOKEN}",
-            f"date_from={start_str}%2000:00:00",
-            f"date_to={end_str}%2000:00:00"
-          ]
-        ), timeout=5
+    # Espera hasta adquirir el lock (mutua exclusión con otros scrapers)
+    from services.framework_scraping.locks import AsyncFileLock, DEFAULT_LOCK_PATH
+    async with AsyncFileLock(DEFAULT_LOCK_PATH, poll_interval=0.5, timeout=None):
+      async with httpx.AsyncClient() as client:
+        response = await client.get(
+          f"{const.SOURCE_URL}?" + "&".join(
+            [
+              f"token={const.ACCESS_TOKEN}",
+              f"date_from={start_str}%2000:00:00",
+              f"date_to={end_str}%2000:00:00"
+            ]
+          ), timeout=5
+        )
+        response.raise_for_status()
+        messages = response.json()["statistics"][currency]["messages"]
+      
+      return types.MessagesStep(
+        end=end_str,
+        start=start_str,
+        messages=messages
       )
-      response.raise_for_status()
-      messages = response.json()["statistics"][currency]["messages"]
-    
-    return types.MessagesStep(
-      end=end_str,
-      start=start_str,
-      messages=messages
-    )
   except HTTPError as error:
     print(f"HTTP error occurred: {error!r}")  # Usar !r para mostrar la representación completa
     if hasattr(error, 'response') and error.response is not None:

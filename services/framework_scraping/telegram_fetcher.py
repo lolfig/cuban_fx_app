@@ -24,8 +24,11 @@ async def fetch_telegram_messages(
             messages=[]
         )
     
-    # Execute the scraper
-    await scrape_telegram(channels, '')
+    # Espera hasta adquirir el lock antes de raspar Telegram
+    from services.framework_scraping.locks import AsyncFileLock, DEFAULT_LOCK_PATH
+    async with AsyncFileLock(DEFAULT_LOCK_PATH, poll_interval=0.5, timeout=None):
+        # Execute the scraper
+        await scrape_telegram(channels, '')
     
     # Read the messages from the JSON file
     with open(nombre_archivo_json, 'r', encoding='utf-8') as f:
