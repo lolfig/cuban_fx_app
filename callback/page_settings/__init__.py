@@ -86,6 +86,7 @@ def delete_channel(n_clicks, existing_channels):
         Output("telegram-username", "value"),
         Output("update-interval", "value"),
         Output("history-days", "value"),
+        Output("daily-run-time", "value"),
         Output("settings-feedback", "children"),
         Output("settings-feedback", "is_open")
     ],
@@ -97,15 +98,16 @@ def delete_channel(n_clicks, existing_channels):
     State("channel-list", "children"),
     State("update-interval", "value"),
     State("history-days", "value"),
+    State("daily-run-time", "value"),
     prevent_initial_call=True
 )
-def save_settings(n_clicks, api_id, api_hash, phone, username, channels, update_interval, history_days):
+def save_settings(n_clicks, api_id, api_hash, phone, username, channels, update_interval, history_days, daily_run_time):
     if not n_clicks:
-        return False, api_id, api_hash, phone, username, update_interval, history_days, "", False
+        return False, api_id, api_hash, phone, username, update_interval, history_days, daily_run_time, "", False
     
     # Validar campos requeridos
     if not all([api_id, api_hash, phone, username]):
-        return False, api_id, api_hash, phone, username, update_interval, history_days, "❌ Todos los campos son requeridos", True
+        return False, api_id, api_hash, phone, username, update_interval, history_days, daily_run_time, "❌ Todos los campos son requeridos", True
     
     channel_urls = []
     if channels:
@@ -119,11 +121,12 @@ def save_settings(n_clicks, api_id, api_hash, phone, username, channels, update_
         'username': username,
         'channels': channel_urls,
         'update_interval': update_interval,
-        'history_days': history_days
+        'history_days': history_days,
+        'daily_run_time': daily_run_time or ""  # string "HH:MM" o vacío
     }
     
     save_config(config)
-    return False, api_id, api_hash, phone, username, update_interval, history_days, "✅ Configuración guardada exitosamente", True
+    return False, api_id, api_hash, phone, username, update_interval, history_days, daily_run_time, "✅ Configuración guardada exitosamente", True
 
 @callback(
     [
@@ -133,6 +136,7 @@ def save_settings(n_clicks, api_id, api_hash, phone, username, channels, update_
         Output("telegram-username", "value", allow_duplicate=True),
         Output("update-interval", "value", allow_duplicate=True),
         Output("history-days", "value", allow_duplicate=True),
+        Output("daily-run-time", "value", allow_duplicate=True),
         Output("channel-list", "children", allow_duplicate=True)
     ],
     Input("restore-settings-btn", "n_clicks"),
@@ -154,5 +158,6 @@ def load_initial_values(n_clicks):
         config.get('username', ''),
         config.get('update_interval', 60),
         config.get('history_days', 30),
+        config.get('daily_run_time', ''),  # "HH:MM" o ''
         channel_list
     ]

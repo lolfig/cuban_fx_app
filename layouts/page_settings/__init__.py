@@ -76,7 +76,13 @@ layout = dbc.Container([
                         dbc.Label("Días de Histórico"),
                         dbc.Input(type="number", id="history-days", value=30, min=1)
                     ], width=6)
-                ])
+                ]),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Label("Hora diaria de ejecución"),
+                        dbc.Input(type="time", id="daily-run-time", placeholder="HH:MM")
+                    ], width=6)
+                ], className="mt-3")
             ])
         ])
     ),
