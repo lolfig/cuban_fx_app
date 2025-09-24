@@ -95,6 +95,15 @@ def load_raw_messages(date):
         return pd.DataFrame()
 
 
+def load_raw_messages_telegram(date):
+    from config.const import DIR_TELEGRAM_MESSAGES
+    try:
+        mess = pd.read_parquet(f"{DIR_TELEGRAM_MESSAGES}/{date}.parquet")
+        return mess.iloc[:, :2]
+    except FileNotFoundError:
+        return pd.DataFrame()
+
+
 def get_imfs(price_series):
     col = price_series.columns[2]
     serie = price_series[col].values

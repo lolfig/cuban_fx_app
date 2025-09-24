@@ -33,14 +33,41 @@ layout = dbc.Container([
                         dbc.FormFeedback("Este campo es requerido", type="invalid")
                     ], width=6),
                     dbc.Col([
-                        dbc.Label("Username"),
-                        dbc.Input(type="text", id="telegram-username", placeholder="@username", required=True),
+                        dbc.Label("Nombre de Usuario"),
+                        dbc.Input(type="text", id="telegram-username", placeholder="@usuario", required=True),
                         dbc.FormFeedback("Este campo es requerido", type="invalid")
                     ], width=6)
-                ], className="mt-3")
+                ]),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Label("Intervalo de Actualización (min)"),
+                        dbc.Input(type="number", id="update-interval", value=60, min=1)
+                    ], width=4),
+                    dbc.Col([
+                        dbc.Label("Historial (días)"),
+                        dbc.Input(type="number", id="history-days", value=30, min=1)
+                    ], width=4),
+                    dbc.Col([
+                        dbc.Label("Hora corrida diaria (opcional)"),
+                        dbc.Input(type="text", id="daily-run-time", placeholder="HH:MM")
+                    ], width=4)
+                ]),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Label("Canales de Telegram"),
+                        dcc.Input(id="new-channel-input", type="text", placeholder="https://t.me/canal", className="me-2"),
+                        dbc.Button(DashIconify(icon="mdi:plus"), id="add-channel-btn", color="primary", outline=True, size="sm"),
+                        dbc.ListGroup(id="channel-list", className="mt-2")
+                    ], width=12)
+                ]),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Button("Guardar configuración", id="save-settings-btn", color="success", className="me-2"),
+                        dbc.Button("Restaurar", id="restore-settings-btn", color="secondary")
+                    ], width=12)
+                ])
             ])
-        ]),
-        className="mb-3"
+        ])
     ),
     
     # Sección de Configuración de Canales
@@ -112,5 +139,12 @@ layout = dbc.Container([
                 style={"maxWidth": "400px", "margin": "0 auto"}
             )
         ], className="d-flex justify-content-center")
-    ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Hr(),
+            dbc.Button("Ejecutar scraping de Telegram ahora", id="run-telegram-scrape-btn", color="primary", className="mt-2"),
+            html.Div(id="run-telegram-scrape-status", className="mt-2")
+        ], width=12)
+    ]),
 ])

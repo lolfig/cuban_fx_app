@@ -10,10 +10,14 @@ CURRENCIES = Literal['USD', 'EUR']
 
 DIR_DATA_ANALYTICS = os.path.join(os.getcwd(), "data", "analytics")
 DIR_DATA_MESSAGES = os.path.join(os.getcwd(), "data", "messages")
+DIR_TELEGRAM_MESSAGES = os.path.join(os.getcwd(), "data", "messages_telegram")
+DIR_TELEGRAM_ANALYTICS = os.path.join(os.getcwd(), "data", "analytics_telegram")
 
 for directory in [
   DIR_DATA_ANALYTICS,
-  DIR_DATA_MESSAGES
+  DIR_DATA_MESSAGES,
+  DIR_TELEGRAM_MESSAGES,
+  DIR_TELEGRAM_ANALYTICS
 ]:
   os.makedirs(directory, exist_ok=True)
 ACTIVATE_INTERVAL = False

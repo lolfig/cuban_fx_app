@@ -161,3 +161,20 @@ def load_initial_values(n_clicks):
         config.get('daily_run_time', ''),  # "HH:MM" o ''
         channel_list
     ]
+
+@callback(
+    Output("run-telegram-scrape-status", "children"),
+    Input("run-telegram-scrape-btn", "n_clicks"),
+    prevent_initial_call=True
+)
+def run_telegram_scrape(n_clicks):
+    if not n_clicks:
+        return ""
+    # Ejecutar scraping de Telegram (bloqueante mientras corre)
+    try:
+        import asyncio
+        from data_storage import data_store
+        asyncio.run(data_store.sync_telegram_data())
+        return "✅ Scraping de Telegram completado. Revisa la página 'Redes Sociales'."
+    except Exception as e:
+        return f"❌ Error durante el scraping: {e}"

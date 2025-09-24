@@ -85,6 +85,8 @@ def display_page(pathname, global_state):
     return layouts.page_data_status.layout, *data
   elif pathname.startswith("/dash/telegram"):
     return layouts.page_data_status_telegram.layout, *data
+  elif pathname.startswith("/dash/social"):  # NUEVO
+    return layouts.page_social_networks.layout, *data
   elif pathname.startswith("/dash/settings"):
     return layouts.page_settings.layout, *data
   else:

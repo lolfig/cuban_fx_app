@@ -33,7 +33,7 @@ print(f"Ruta de la carpeta 'Data_Scrap': {ruta_base}")
 # Variables
 nombre_archivo_json = 'mensajes.json'
 clave_busqueda = ''  # Dejar vacío si no buscas palabra clave
-
+max_reintentos = 3
 # Asegura que exista el archivo JSON principal
 if not os.path.exists(nombre_archivo_json):
     with open(nombre_archivo_json, 'w', encoding='utf-8') as f:
@@ -78,7 +78,7 @@ async def scrape_telegram(channels, session_file):
     start_time = time.time()
 
     async with TelegramClient(username, api_id, api_hash) as client:
-        for canal in canales:
+        for canal in channels: # Cambiado de 'canales' a 'channels'
             reintento = 0
             mensajes_nuevos = []
 

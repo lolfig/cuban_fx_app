@@ -29,6 +29,20 @@ navigation_drawer = dbc.Offcanvas(
           )
         ]
       ),
+      
+      dbc.ListGroupItem(  # NUEVO
+        className="d-flex justify-content-between align-items-start",
+        href="/dash/social",
+        children=[
+          html.Div(
+            className="ms-2 me-auto",
+            children=[
+              DashIconify(icon="mdi:account-group", className="me-2"),
+              "Redes Sociales"
+            ]
+          )
+        ]
+      ),
       dbc.ListGroupItem(
         className="d-flex justify-content-between align-items-start",
         href="/dash/load_data",
@@ -40,6 +54,7 @@ navigation_drawer = dbc.Offcanvas(
           badge_missing_days
         ]
       ),
+      
       dbc.ListGroupItem(
         className="d-flex justify-content-between align-items-start",
         href="/dash/telegram",
@@ -48,7 +63,7 @@ navigation_drawer = dbc.Offcanvas(
             className="ms-2 me-auto",
             children=[
               DashIconify(icon="mdi:telegram", className="me-2"),
-              "Datos Cargados de Telegram"
+              "Datos Cargados de Redes Sociales"
             ]
           )
         ]

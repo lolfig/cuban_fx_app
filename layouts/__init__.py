@@ -4,5 +4,6 @@ from . import (
   page_dashboard,
   page_data_status,
   page_settings,
-  page_data_status_telegram
+  page_data_status_telegram,
+  page_social_networks  # NUEVO
 )
