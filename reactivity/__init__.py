@@ -6,7 +6,7 @@ websocket = DashSocketIO(
     eventNames=["update"],
 )
 in_websocket = Input(websocket, "data-update")
-
+ 
 url = dcc.Location(id="url", refresh=False)
 in_pathname_url = Input(url, "pathname")
 router_view = html.Div()

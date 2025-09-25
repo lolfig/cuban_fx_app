@@ -8,6 +8,7 @@ from services.framework_analytics.analytics_utils import find_marginal_price
 
 
 def _extract_orders(df):
+  
   """
   Extracts buy and sell orders from the DataFrame.
 
@@ -34,7 +35,11 @@ def _extract_orders(df):
     if order and 45 < order["price"] < 500 and 0 <= order["size"] < 50000
   ]
   
-  return pd.DataFrame(buy_orders), pd.DataFrame(sell_orders), all_orders
+  # Ensure DataFrames have expected columns even if empty
+  buy_orders_df = pd.DataFrame(buy_orders, columns=["vol_compra", "precio_compra"])
+  sell_orders_df = pd.DataFrame(sell_orders, columns=["vol_venta", "precio_venta"])
+
+  return buy_orders_df, sell_orders_df, all_orders
 
 
 def _calculate_levels(orders_df, is_sell=False):
@@ -54,8 +59,8 @@ def _calculate_levels(orders_df, is_sell=False):
     orders_df.sort_values(by="precio_compra", ascending=False, inplace=True)
   
   volumen_nivel = np.array(
-    orders_df["vol_compra" if not is_sell else "vol_venta"].cumsum()
-  )
+    orders_df["vol_compra"] if not is_sell else orders_df["vol_venta"]
+  ).cumsum()
   precio_nivel = np.array(orders_df[orders_df.columns[1]].tolist())
   
   return volumen_nivel, precio_nivel
@@ -111,7 +116,7 @@ def _do_intra_day_analytics(date, compra_df, venta_df):
   # Group orders for histogram plot
   grouped_buy = _group_orders(compra_df)
   grouped_sell = _group_orders(venta_df)
-  
+  print("hacer analytics")
   analytics = {
     "Compras_ordenadas": grouped_buy[grouped_buy >= 500],
     "Ventas_ordenadas": grouped_sell[grouped_sell >= 500],

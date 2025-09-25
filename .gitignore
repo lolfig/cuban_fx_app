@@ -8,4 +8,13 @@
 **.code-workspace
 .conda**
 **.zip
+INFO_IMPORTANTE/
 **__pycache__**
+# Telegram sensitive config and runtime artifacts
+config/telegram_config.json
+data/telegram_channels_status.json
+mensajes.json
+
+# Telethon session files (very sensitive)
+*.session
+*.session-journal

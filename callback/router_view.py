@@ -4,9 +4,12 @@ from flask import request
 from data_storage import data_store
 from layouts import (
   page_data_status,
-  page_dashboard
+  page_dashboard,
+  page_settings,
+  page_data_status_telegram
 )
 from reactivity import out_children_router_view, in_pathname_url
+import layouts
 from reactivity.storage.background_task import out_storage_background_task
 from reactivity.storage.background_task_progress import out_storage_background_task_progress
 from reactivity.storage.global_state import state_storage_global_state
@@ -76,7 +79,15 @@ def display_page(pathname, global_state):
 
   data = data_store.get_storage_update()
 
-  if pathname == '/dash/load_data':
-    return page_data_status.layout, *data
+  if pathname == "/dash":
+    return layouts.page_dashboard.layout, *data
+  elif pathname.startswith("/dash/load_data"):
+    return layouts.page_data_status.layout, *data
+  elif pathname.startswith("/dash/telegram"):
+    return layouts.page_data_status_telegram.layout, *data
+  elif pathname.startswith("/dash/social"):  # NUEVO
+    return layouts.page_social_networks.layout, *data
+  elif pathname.startswith("/dash/settings"):
+    return layouts.page_settings.layout, *data
   else:
     return page_dashboard.layout, *data

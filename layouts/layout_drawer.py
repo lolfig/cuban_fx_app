@@ -1,6 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import html, Output, State
-
+from dash_iconify import DashIconify
 from config.const import MISSING_DATE_BADGE_COLOR
 
 badge_missing_days = dbc.Badge(
@@ -29,6 +29,20 @@ navigation_drawer = dbc.Offcanvas(
           )
         ]
       ),
+      
+      dbc.ListGroupItem(  # NUEVO
+        className="d-flex justify-content-between align-items-start",
+        href="/dash/social",
+        children=[
+          html.Div(
+            className="ms-2 me-auto",
+            children=[
+              DashIconify(icon="mdi:account-group", className="me-2"),
+              "Redes Sociales"
+            ]
+          )
+        ]
+      ),
       dbc.ListGroupItem(
         className="d-flex justify-content-between align-items-start",
         href="/dash/load_data",
@@ -38,6 +52,37 @@ navigation_drawer = dbc.Offcanvas(
             children="Datos Cargados"
           ),
           badge_missing_days
+        ]
+      ),
+      
+      dbc.ListGroupItem(
+        className="d-flex justify-content-between align-items-start",
+        href="/dash/telegram",
+        children=[
+          html.Div(
+            className="ms-2 me-auto",
+            children=[
+              DashIconify(icon="mdi:telegram", className="me-2"),
+              "Datos Cargados de Redes Sociales"
+            ]
+          )
+        ]
+      ),
+      dbc.ListGroupItem(
+        className="d-flex justify-content-between align-items-start",
+        href="/dash/settings",
+        children=[
+          html.Div(
+            className="ms-2 me-auto",
+            children=[
+              DashIconify(
+                icon="mdi:cog",
+                className="me-2",
+                width=20
+              ),
+              "Configuración"
+            ]
+          )
         ]
       ),
       html.Div(style={'flex': '1'}),
